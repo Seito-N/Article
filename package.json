@@ -1,0 +1,23 @@
+{
+  "name": "article",
+  "version": "1.0.0",
+  "description": "ZennやQuiitaなどに投稿するコラムの作成用",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Seito-N/Article.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Seito-N/Article/issues"
+  },
+  "homepage": "https://github.com/Seito-N/Article#readme",
+  "dependencies": {
+    "zenn-cli": "^0.1.133"
+  }
+}

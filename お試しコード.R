@@ -4,17 +4,19 @@ library(gtsummary)
 library(ggrepel)
 library(scales)
 
+search_dataset("GDP")
+
 metadata <- get_data_structure("SNA_TABLE1")
 metadata$UNIT
 
 
 
-dat_gdp_df <- get_dataset(dataset = "SNA_TABLE1",
-                          filter = list(c("JPN", "CAN", "FRA", 
-                                          "DEU", "ITA", "GBR", "USA"), 
-                                        "B1_GA", 
-                                        "CXC"), 
-                          start_time = 1974, end_time = 2021)
+dat_gdp <- get_dataset(dataset = "SNA_TABLE1",
+                       filter = list(c("JPN", "CAN", "FRA", 
+                                       "DEU", "ITA", "GBR", "USA"), 
+                                     "B1_GA", 
+                                     "CXC"), 
+                       start_time = 1974, end_time = 2021)
 
 
 dat_gdp_df %>% 
@@ -29,7 +31,7 @@ dat_gdp_df %>%
   arrange(desc(obsTime))
 
 
-dat_gdp_df %>% 
+dat_gdp %>% 
   rename(`国` = LOCATION,
          `年` = obsTime, 
          GDP = obsValue) %>% 
@@ -44,9 +46,8 @@ dat_gdp_df %>%
                    na.rm = TRUE, show.legend = FALSE) + 
   scale_y_continuous(labels = unit_format(unit = "M"),
                      breaks = seq(0, 24000000, by = 2000000)) +
-  scale_x_continuous(breaks = seq(1974, 2021, by = 5)) + 
+  scale_x_continuous(breaks = seq(1974, 2021, by = 2)) + 
   coord_cartesian(xlim = c(1974, 2025), expand = TRUE) + 
-  labs(title = "GDPの国際比較 USD")
+  labs(title = "GDP の国際比較（USD）")
   # scale_y_continuous(labels = function(x) format(x, scientific = FALSE))
-  
   

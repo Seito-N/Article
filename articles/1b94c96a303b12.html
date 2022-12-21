@@ -356,33 +356,32 @@ display: none;
 <div id="記事について" class="section level1">
 <h1>記事について</h1>
 <p>この記事は R アドベントカレンダー 22 日目の記事です。</p>
-<p><code>{OECD}</code>
-パッケージを使ってデータを取得し、分析する方法について紹介します。この記事では各国の
-GDP を取得して可視化するところまでを扱います。</p>
+<p><code>{OECD}</code> パッケージを使って各国の GDP
+データを取得し、可視化するところまでを扱います。</p>
 </div>
 <div id="oecdパッケージとは" class="section level1">
 <h1>OECDパッケージとは</h1>
-<div id="目的" class="section level2">
-<h2>目的</h2>
+<div id="用途" class="section level2">
+<h2>用途</h2>
 <p>OECD のデータを検索し、抽出することができます。CRANの文書は<a href="https://cran.r-project.org/web/packages/OECD/OECD.pdf">こちら</a>にあります。</p>
 </div>
 <div id="使用の流れ" class="section level2">
 <h2>使用の流れ</h2>
-<p>以下 3 つのプロセスに分けて紹介します。</p>
+<p>この記事では以下 3 つのプロセスに分けて紹介します。</p>
 <ol style="list-style-type: decimal">
-<li><code>{OECD}</code> パッケージのインストール</li>
+<li>パッケージのインストール</li>
 <li>データの取得</li>
 <li>加工と可視化</li>
 </ol>
 </div>
 </div>
-<div id="oecd-パッケージのインストール" class="section level1">
-<h1><code>{OECD}</code> パッケージのインストール</h1>
+<div id="パッケージのインストール" class="section level1">
+<h1>パッケージのインストール</h1>
 <p>まずは <code>{OECD}</code>
 パッケージをインストールします。その後、どのような関数がこのパッケージに含まれるかを見てみます。</p>
 <div id="バージョンを指定してインストール" class="section level2">
 <h2>バージョンを指定してインストール</h2>
-<p>後ほど触れますが、<code>{OECD</code>}
+<p><code>{OECD}</code>
 パッケージの最新バージョンにはバグの出る関数があります（GitHub 上に <a href="https://github.com/expersso/OECD/issues/24">Issues</a>
 が立てられています）。そのためここでは <code>{devtools}</code>
 パッケージを使って 1 つ古いバージョンをインストールします。</p>
@@ -400,11 +399,14 @@ GDP を取得して可視化するところまでを扱います。</p>
 <h2>パッケージを覗く</h2>
 <p>パッケージがインストールできたので、具体的にどのような関数が含まれるかを見てみます。</p>
 <p>まずは <code>library</code> 関数で <code>{OECD}</code>
-パッケージを取得します。</p>
-<pre class="{r}"><code>library(OECD)</code></pre>
+パッケージを取得します。後で使用する別のパッケージもここで取得しておきます。未インストールのパッケージについては
+<code>install.packages</code> にてインストールをお願いします。</p>
+<pre class="{r}"><code>library(OECD)
+library(tidyverse)
+library(ggrepel)
+library(scales)</code></pre>
 <p><code>{OECD}</code>
-パッケージに含まれる関数は以下のとおりです。いかにもデータをゲットできそうです。</p>
-<p>なおこの後使う関数は
+パッケージに含まれる関数は以下のとおりです。いかにもデータをゲットできそうです。この後使う関数は
 <code>search_dataset</code>、<code>get_data_structure</code>、<code>get_dataset</code>
 の 3 つです。</p>
 <pre><code>browse_metadata         Browse the metadata related to a series.
@@ -416,57 +418,61 @@ search_dataset          Search codes and descriptions of available OECD series.<
 </div>
 <div id="データを取得する" class="section level1">
 <h1>データを取得する</h1>
-<p>データの取得は大きく 2 つのプロセスで構成されます。</p>
+<p>データの取得は大きく 3 つのプロセスで構成されます。</p>
 <ol style="list-style-type: decimal">
 <li>データの検索</li>
-<li>メタデータの確認とデータ取得</li>
+<li>メタデータの確認</li>
+<li>データ取得</li>
 </ol>
 <div id="データの検索" class="section level2">
 <h2>データの検索</h2>
 <p>実際にどのようなデータがあるかを調べます。</p>
 <p>データの検索を行うには <code>search_dataset</code>
-関数を使用します。今回は各国の GDP を調べたいので、“economic outlook”
+関数を使用します。今回は各国の GDP を調べたいので、“GDP”
 という文字列を入力して検索しました。</p>
-<p>どのようなワードで検索するかについては、<a href="https://stats.oecd.org/">OECD Stat</a>
-を直接見に行くのが良いかもしれません。</p>
+<p>どのようなワードで検索すれば良いか分からない場合は <a href="https://stats.oecd.org/">OECD Stat</a>
+を直接見に行くのが良いです。</p>
+<p>例えば以下画像の検索画面で National Accounts <span class="math inline">\(\rightarrow\)</span> Main Aggregates <span class="math inline">\(\rightarrow\)</span> 1. Gross domestic product
+(GDP)
+と進めばお目当てのデータにたどり着くことができます（この辺りは慣れが必要な部分でもあり、私も試行錯誤しています）。</p>
 <div class="figure">
-<img src="./Article/articles/OECD.PNG" alt />
-<p class="caption">OECDstat</p>
+<img src="/images/OECD.jpg" alt />
+<p class="caption">OECD stat の検索画面</p>
 </div>
-<pre class="{r}"><code>search_dataset(string = &quot;Economic Outlook No&quot;)</code></pre>
-<p>結果の一部を表示しています。今回は一番下の
-<code>EO112_INTERNET</code> のデータセットを使用します。</p>
-<pre><code>      id              title
-6     EO78_MAIN       Economic Outlook No 78 - December 2005 - Annual Projections for OECD Countries
-9     EO78_TRADE      Economic Outlook No 78 - December 2005 - Annual Trade and Payments Projections
-12    EO77_MAIN       Economic Outlook No 77 - June 2005 - Annual Projections for OECD Countries
-14    EO77_TRADE      Economic Outlook No 77 - June 2005 - Annual Trade and Payments Projections
-64    EO110_INTERNET  Economic Outlook No 110 - December 2021.
-1549  EO112_INTERNET  Economic Outlook No 112 - November 2022.</code></pre>
+<pre class="{r}"><code>search_dataset(&quot;GDP&quot;)</code></pre>
+<p>結果の一部を表示していますが、全部で 28
+件ヒットしたようです。今回は上から 2 番目にある <code>SNA_TABLE1</code>
+のデータセットを使用します。</p>
+<pre><code># A tibble: 28 × 2
+   id                              title                                          
+ 1 FIGURE1_E_AEO2013               Figure 1: Real GDP growth 2013 (East)
+ 2 SNA_TABLE1                      1. Gross domestic product (GDP)
+ 3 PPPGDP                          Purchasing Power Parities for GDP and related indicators</code></pre>
 </div>
-<div id="メタデータの取得" class="section level2">
-<h2>メタデータの取得</h2>
-<p>データセットをすべて取得するとサイズが大きいので、そのデータの中で必要なものを取得します。そのためにはまず、今回使用するデータのメタデータを取得します。</p>
-<pre class="{r}"><code>metadata &lt;- get_data_structure(&quot;EO112_INTERNET&quot;)</code></pre>
+<div id="メタデータの確認" class="section level2">
+<h2>メタデータの確認</h2>
+<p>データセットのすべての行を取得するとサイズが大きいので、データセットの中で必要な箇所だけを取得します。</p>
+<p>そのためにはまず、今回使用するデータのメタデータを取得します。関数に与えるのはデータセットの
+<code>title</code> ではなく <code>id</code> です。</p>
+<pre class="{r}"><code>metadata &lt;- get_data_structure(&quot;SNA_TABLE1&quot;)</code></pre>
 <p><code>VAR_DESC</code>
-にアクセスすると、メタデータの中に何が入っているかが分かります。<code>LOCATION</code>
-から <code>REFERENCEPERIOD</code> までで 10 個の List
-が入っています。</p>
-<pre><code>&gt; metadata$VAR_DESC
-                id        description
+にアクセスすると、メタデータの中に何が入っているか確認できます。<code>LOCATION</code>
+から <code>REFERENCEPERIOD</code> までで 10 個の <code>List</code>
+が入っています。一部覗いてみます。</p>
+<pre class="{r}"><code>metadata$VAR_DESC</code></pre>
+<pre><code>                id        description
 1         LOCATION            Country
-2         VARIABLE           Variable
-3        FREQUENCY          Frequency
-4             TIME               Time
+2         TRANSACT        Transaction
+3          MEASURE            Measure
+4             TIME               Year
 5        OBS_VALUE  Observation Value
 6      TIME_FORMAT        Time Format
 7       OBS_STATUS Observation Status
 8             UNIT               Unit
 9        POWERCODE    Unit multiplier
 10 REFERENCEPERIOD   Reference period</code></pre>
-<p>各 List はデータフレームになっています。一部覗いてみます。</p>
 <p><code>LOCATION</code> には国名が入っています。</p>
-<pre class="{r}"><code>metadata$LOCATION %&gt;% head()</code></pre>
+<pre class="{r}"><code>head(metadata$LOCATION)</code></pre>
 <pre><code>   id     label
 1 AUS Australia
 2 AUT   Austria
@@ -474,17 +480,95 @@ search_dataset          Search codes and descriptions of available OECD series.<
 4 CAN    Canada
 5 CHL     Chile
 6 COL  Colombia</code></pre>
-<p><code>FREQUENCY</code> には Annual
-データなのか、四半期データなのかの分類があります。</p>
-<pre class="{r}"><code>metadata$FREQUENCY %&gt;% head()</code></pre>
-<pre><code>&gt; metadata$FREQUENCY %&gt;% head()
-  id     label
-1  A    Annual
-2  Q Quarterly</code></pre>
-<div id="section" class="section level3">
-<h3></h3>
+<p>これも一部抜粋ですが、<code>TRANSACT</code>
+にはデータの種類が入っています。今回は <code>B1_GA</code> の
+<code>Gross domestic product (output approach)</code>、つまり生産側の
+GDP を使用することにします。支出側は 28 番目にあります。</p>
+<pre class="{r}"><code>metadata$TRANSACT</code></pre>
+<pre><code>    id        label
+1   GDP       1--Gross domestic product
+2   B1_GA     Gross domestic product (output approach)
+3   B1G_P119  Gross value added at basic prices, excluding FISIM
+4   B1G       Gross value added at basic prices, total activity
+5   B1GA_B    Agriculture, hunting and forestry; fishing (ISIC rev3)
+28  B1_GE     Gross domestic product (expenditure approach)</code></pre>
+<p>このような流れで、概ねどのような形でデータを取得すれば良さそうかアタリを付けていきます。</p>
+</div>
+<div id="データの取得" class="section level2">
+<h2>データの取得</h2>
+<p>データの取得に使用する関数は <code>get_dataset</code>
+です。メタデータで必要なデータを確認し、引数の <code>filter</code>
+に指定します。また、<code>start_time</code>、<code>end_time</code>
+を指定して必要な年次に絞ります。</p>
+<p>今回は以下のデータを取得しました。</p>
+<ul>
+<li>国は G7 （カナダ、フランス、ドイツ、イタリア、日本、英国、米国）
+に限定</li>
+<li>データは生産側 GDP</li>
+<li>価格は現在の価格で現在の為替レート</li>
+<li>1974 年から 2021
+年まで（高度経済成長期が終わった後から現在まで）</li>
+</ul>
+<pre class="{r}"><code>dat_gdp &lt;- get_dataset(dataset = &quot;SNA_TABLE1&quot;,
+                       filter = list(c(&quot;JPN&quot;, &quot;CAN&quot;, &quot;FRA&quot;, 
+                                       &quot;DEU&quot;, &quot;ITA&quot;, &quot;GBR&quot;, &quot;USA&quot;), # G7 
+                                     &quot;B1_GA&quot;, # 生産側 GDP
+                                     &quot;CXC&quot; # 現在の価格、現在の為替レート
+                                     ), 
+                       start_time = 1974, end_time = 2021)</code></pre>
+<p>取得したデータを見てみます。</p>
+<pre class="{r}"><code>dat_gdp %&gt;% head()</code></pre>
+<pre><code># A tibble: 6 × 9
+  LOCATION TRANSACT MEASURE TIME_FORMAT UNIT  POWERCODE obsTime obsValue OBS_STATUS
+  &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;     
+1 CAN      B1_GA    CXC     P1Y         USD   6         1974     160406. E         
+2 CAN      B1_GA    CXC     P1Y         USD   6         1975     173841. E         
+3 CAN      B1_GA    CXC     P1Y         USD   6         1976     206570. E         
+4 CAN      B1_GA    CXC     P1Y         USD   6         1977     211624. E         
+5 CAN      B1_GA    CXC     P1Y         USD   6         1978     218641. E         
+6 CAN      B1_GA    CXC     P1Y         USD   6         1979     243067. E </code></pre>
+<p>例えば一番右の列にある <code>OBS_STATUS</code> は E
+という値が入っています。これをメタデータで見てみると、推定値 (Estimated
+value) と暫定値 (Provisional value)
+がデータセットに含まれているようです。</p>
+<pre class="{r}"><code>metadata$OBS_STATUS</code></pre>
+<pre><code>   id     label
+4   E     Estimated value
+11  P     Provisional value</code></pre>
 </div>
 </div>
+<div id="加工と可視化" class="section level1">
+<h1>加工と可視化</h1>
+<p>ここまでで必要なデータセットを取得できたので、最後はこれを加工して可視化します。本記事のメインスコープからはやや外れますので詳細な説明は避けますが、今回は
+<code>ggplot</code> を使って折れ線グラフを作成しました。</p>
+<pre class="{r}"><code>dat_gdp %&gt;% 
+  
+  # 可視化用にデータの加工
+  rename(`国` = LOCATION,
+         `年` = obsTime, 
+         GDP = obsValue) %&gt;% 
+  group_by(`国`) %&gt;% 
+  mutate(`年` = as.double(`年`), 
+         label = if_else(`年` == max(`年`), `国`, NA_character_)) %&gt;% 
+  
+  # 可視化
+  ggplot(data = ., 
+         mapping = aes(x = `年`, y = GDP, color = `国`)) + 
+  geom_point(show.legend = TRUE) + 
+  geom_line(show.legend = TRUE) + 
+  geom_label_repel(mapping = aes(label = label), nudge_x = Inf,
+                   na.rm = TRUE, show.legend = FALSE) + 
+  scale_y_continuous(labels = unit_format(unit = &quot;M&quot;),
+                     breaks = seq(0, 24000000, by = 2000000)) +
+  scale_x_continuous(breaks = seq(1974, 2021, by = 2)) + 
+  coord_cartesian(xlim = c(1974, 2025), expand = TRUE) + 
+  labs(title = &quot;GDP の国際比較（USD）&quot;)</code></pre>
+<p>結果は以下画像のように表示されます。</p>
+<div class="figure">
+<img src="/images/Rplot.png" alt />
+<p class="caption">GDP の国際比較</p>
+</div>
+<p>以上です。お読みいただきありがとうございました。</p>
 </div>
 
 

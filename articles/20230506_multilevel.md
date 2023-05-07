@@ -2,7 +2,7 @@
 title: "R と Stata でマルチレベル分析"
 emoji: "[:snowman:]"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: [R, Stata, データ分析, マルチレベル]
+topics: [R, Stata, データ分析, マルチレベル分析]
 published: false
 ---
 

@@ -1,2 +1,2 @@
 # Article
-ZennやQuiitaなどに投稿するコラムの作成用
+Zenn や Quiita などに投稿する記事の作成用

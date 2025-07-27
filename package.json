@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/Seito-N/Article#readme",
   "dependencies": {
-    "zenn-cli": "^0.1.133"
+    "zenn-cli": "^0.1.162"
   }
 }
